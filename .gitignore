@@ -1,0 +1,6 @@
+# vscode stuff
+*.code-workspace
+.vscode
+
+# executables
+*.exe
