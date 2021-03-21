@@ -3,12 +3,10 @@
 #include "..\\src\\TestValidator.hpp"
 
 int main(){
-    TestValidator::Reader reader(std::cin);
-
+    TestValidator::Validator validator(std::cin, std::cout);
     int x;
-    std::cout<<reader.readInt(x)<<std::endl;
-    std::cout<<x<<std::endl;
-
+    validator.readIntegerInRange(x, 1, 50, "Hello");
+    validator.readEndOfFile();
 
     return 0;
 }

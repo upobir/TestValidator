@@ -22,7 +22,7 @@ namespace TestValidator{
 
         int nextChar(){
             int nextChar = is.get();
-            if(nextChar == '\n'){
+            if(lastChar == '\n'){
                 lineCount++;
                 tokenCount = 0;
             }
@@ -38,9 +38,9 @@ namespace TestValidator{
         }
     public:
         Reader(std::istream& _is): is(_is) { 
-            lineCount = 1;
+            lineCount = 0;
             tokenCount = 0;
-            lastChar = ' ';
+            lastChar = '\n';
         }
 
         ~Reader() { }
@@ -83,27 +83,60 @@ namespace TestValidator{
     private:
         std::ostream &os;
     protected:
-        void reportError(std::string &msg){
-            os<<"Read "<<getTokenCount()<<" token(s) at line "<<getLineCount()<<std::endl;
-            os<<"Error: "<<msg<<std::endl;
-            assert(false);
-        }
+        
     public:
         Validator(std::istream &is, std::ostream &_os) : Reader(is), os(_os) { }
         ~Validator() { }
 
+        void reportError(std::string &msg){
+            os<<"Line Number: "<<getLineCount()<<std::endl;
+            os<<"Token Number at current line: "<<getTokenCount()<<std::endl;
+            os<<"Error: "<<msg<<std::endl;
+            assert(false);
+        }
+
         bool readCharAndMatch(char &x, char expected, std::string msg = ""){
-            bool success = readChar(x);
-            if(!success || x != expected){
-                if(msg.empty()){
-                    msg = msg + "Character read failed. expected '" + expected + "', got ";
-                    if(success)
-                        msg = msg + "'" + x + "'";
-                    else
-                        msg = msg + "EOF";
-                }
+            if(!readChar(x) || x != expected){
+                if(msg.empty())
+                    msg = msg + "Character read failed.";
                 reportError(msg);
-                
+            }
+            return true;
+        }
+
+        bool readSpaceChar(std::string msg = ""){
+            if(nextChar() != ' '){
+                if(msg.empty())
+                    msg = msg + "Space read failed.";
+                reportError(msg);
+            }
+            return true;
+        }
+
+        bool readEndOfLine(std::string msg = ""){
+            if(nextChar() != '\n'){
+                if(msg.empty())
+                    msg = msg + "End of Line read failed.";
+                reportError(msg);
+            }
+            return true;
+        }
+
+        bool readEndOfFile(std::string msg = ""){
+            if(nextChar() != EOF){
+                if(msg.empty())
+                    msg = msg + "End of File read failed.";
+                reportError(msg);
+            }
+            return true;
+        }
+
+        template<class T>
+        bool readIntegerInRange(T &x, T lowerLimit, T upperLimit, std::string msg = ""){
+            if(!readInteger(x) || x < lowerLimit || x > upperLimit){
+                if(msg.empty())
+                    msg = msg + "Integer read failed.";
+                reportError(msg);
             }
             return true;
         }
