@@ -55,10 +55,16 @@ namespace TestValidator{
         template<class T>
         bool readInteger(T &x){
             bool neg = false;
+            T maxAllowed = std::numeric_limits<T>::max();
             if(peekChar() == '-'){
                 nextChar();
+                if(std::numeric_limits<T>::min() == 0){
+                    return false;
+                }
+                maxAllowed = std::numeric_limits<T>::min();
                 neg = true;
             }
+
             if(!isdigit(peekChar())){
                 return false;
             }
@@ -66,15 +72,16 @@ namespace TestValidator{
             x = 0;
             while(isdigit(peekChar())){
                 int d = nextChar()-'0';
-                if(x > (std::numeric_limits<T>::max()-d)/10){
+                if(neg){
+                    d = -d;
+                }
+                int threshold = (maxAllowed-d)/10;
+                if((maxAllowed <= x && x < threshold) || (maxAllowed >= x && x > threshold)){
                     x = 0;
                     return false;
                 }
                 x = x * 10 + d;
             }
-
-            if(neg)
-                x = -x;
             return true;
         }
     };
@@ -88,56 +95,67 @@ namespace TestValidator{
         Validator(std::istream &is, std::ostream &_os) : Reader(is), os(_os) { }
         ~Validator() { }
 
-        void reportError(std::string &msg){
+        void reportError(std::string msg, std::string defaultMessage = "Undefined"){
             os<<"Line Number: "<<getLineCount()<<std::endl;
             os<<"Token Number at current line: "<<getTokenCount()<<std::endl;
+
+            if(msg.empty()) msg = defaultMessage;
             os<<"Error: "<<msg<<std::endl;
             assert(false);
         }
 
+        /// constraint checkers
+        template<class T>
+        bool checkNumberIsBetween(T &x, T lowerLimit, T upperLimit, std::string msg = ""){
+            if(x < lowerLimit || x > upperLimit){
+                reportError(msg, "Number out of bounds");
+            }
+            return true;
+        }
+
+        /// readers
+        template<class T>
+        bool readInteger(T &x, std::string msg = ""){
+            if(!Reader::readInteger(x)){
+                reportError(msg, "Integer read failed.");
+            }
+            return true;
+        }
+
+
+        /// readers & constraint checkers
         bool readCharAndMatch(char &x, char expected, std::string msg = ""){
             if(!readChar(x) || x != expected){
-                if(msg.empty())
-                    msg = msg + "Character read failed.";
-                reportError(msg);
+                reportError(msg, "Character read failed");
             }
             return true;
         }
 
         bool readSpaceChar(std::string msg = ""){
             if(nextChar() != ' '){
-                if(msg.empty())
-                    msg = msg + "Space read failed.";
-                reportError(msg);
+                reportError(msg, "Space read failed.");
             }
             return true;
         }
 
         bool readEndOfLine(std::string msg = ""){
             if(nextChar() != '\n'){
-                if(msg.empty())
-                    msg = msg + "End of Line read failed.";
-                reportError(msg);
+                reportError(msg, "End of Line read failed.");
             }
             return true;
         }
 
         bool readEndOfFile(std::string msg = ""){
             if(nextChar() != EOF){
-                if(msg.empty())
-                    msg = msg + "End of File read failed.";
-                reportError(msg);
+                reportError(msg, "End of File read failed.");
             }
             return true;
         }
 
         template<class T>
         bool readIntegerInRange(T &x, T lowerLimit, T upperLimit, std::string msg = ""){
-            if(!readInteger(x) || x < lowerLimit || x > upperLimit){
-                if(msg.empty())
-                    msg = msg + "Integer read failed.";
-                reportError(msg);
-            }
+            readInteger(x, msg);
+            checkNumberIsBetween(x, lowerLimit, upperLimit, msg);
             return true;
         }
     };
