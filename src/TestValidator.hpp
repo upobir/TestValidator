@@ -101,7 +101,7 @@ namespace TestValidator{
 
             if(msg.empty()) msg = defaultMessage;
             os<<"Error: "<<msg<<std::endl;
-            assert(false);
+            throw "Validation Error";
         }
 
         /// constraint checkers
@@ -118,6 +118,13 @@ namespace TestValidator{
         bool readInteger(T &x, std::string msg = ""){
             if(!Reader::readInteger(x)){
                 reportError(msg, "Integer read failed.");
+            }
+            return true;
+        }
+
+        bool readChar(char &x, std::string msg = ""){
+            if(!Reader::readChar(x)){
+                reportError(msg, "Character read failed.");
             }
             return true;
         }
