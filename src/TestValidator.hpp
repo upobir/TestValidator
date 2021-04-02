@@ -2,6 +2,7 @@
 #include <cctype>
 #include <limits>
 #include <cassert>
+#include <regex>
 
 namespace TestValidator{
     class Reader {
@@ -26,7 +27,7 @@ namespace TestValidator{
                 lineCount++;
                 tokenCount = 0;
             }
-            else if(!isspace(nextChar) && isspace(lastChar)){
+            if(!isspace(nextChar) && (lastChar == '\n' ||isspace(lastChar))){
                 tokenCount++;
             }
             lastChar = nextChar;
@@ -100,7 +101,7 @@ namespace TestValidator{
             os<<"Token Number at current line: "<<getTokenCount()<<std::endl;
 
             if(msg.empty()) msg = defaultMessage;
-            os<<"Error: "<<msg<<std::endl;
+            os<<"Error: "<<msg<<std::endl<<std::endl;
             throw "Validation Error";
         }
 
@@ -110,6 +111,22 @@ namespace TestValidator{
             if(x < lowerLimit || x > upperLimit){
                 reportError(msg, "Number out of bounds");
             }
+            return true;
+        }
+
+        bool checkCharMatchesClass(char &x, std::string charClass, std::string msg = ""){
+            std::string format("%1[");
+            format.insert(format.end(), charClass.begin(), charClass.end());
+            format.push_back(']');
+
+            char dummy[2] = {x, 0};
+            char dummy2[2] = {0, 0};
+
+
+            if(sscanf(dummy, format.c_str(), dummy2) != 1){
+                reportError(msg, "Character doesn't match character class");
+            }
+
             return true;
         }
 
@@ -131,10 +148,16 @@ namespace TestValidator{
 
 
         /// readers & constraint checkers
-        bool readCharAndMatch(char &x, char expected, std::string msg = ""){
-            if(!readChar(x) || x != expected){
-                reportError(msg, "Character read failed");
-            }
+        template<class T>
+        bool readIntegerBetween(T &x, T lowerLimit, T upperLimit, std::string msg = ""){
+            readInteger(x, msg);
+            checkNumberIsBetween(x, lowerLimit, upperLimit, msg);
+            return true;
+        }
+
+        bool readCharAndMatchClass(char &x, std::string charClass, std::string msg = ""){
+            readChar(x, msg);
+            checkCharMatchesClass(x, charClass, msg);
             return true;
         }
 
@@ -156,13 +179,6 @@ namespace TestValidator{
             if(nextChar() != EOF){
                 reportError(msg, "End of File read failed.");
             }
-            return true;
-        }
-
-        template<class T>
-        bool readIntegerInRange(T &x, T lowerLimit, T upperLimit, std::string msg = ""){
-            readInteger(x, msg);
-            checkNumberIsBetween(x, lowerLimit, upperLimit, msg);
             return true;
         }
     };
