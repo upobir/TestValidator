@@ -97,8 +97,7 @@ namespace TestValidator{
         ~Validator() { }
 
         void reportError(std::string msg, std::string defaultMessage = "Undefined"){
-            os<<"Line Number: "<<getLineCount()<<std::endl;
-            os<<"Token Number at current line: "<<getTokenCount()<<std::endl;
+            os<<"Line "<<getLineCount()<<", Token "<<getTokenCount()<<std::endl;
 
             if(msg.empty()) msg = defaultMessage;
             os<<"Error: "<<msg<<std::endl<<std::endl;
@@ -127,6 +126,13 @@ namespace TestValidator{
                 reportError(msg, "Character doesn't match character class");
             }
 
+            return true;
+        }
+
+        bool checkCondition(bool condition, std::string msg = ""){
+            if(!condition){
+                reportError(msg, "Condition failed");
+            }
             return true;
         }
 
