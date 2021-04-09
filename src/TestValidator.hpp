@@ -90,13 +90,19 @@ namespace TestValidator{
     class Validator : protected Reader {
     private:
         std::ostream &os;
+        int errorCount;
     protected:
         
     public:
-        Validator(std::istream &is, std::ostream &_os) : Reader(is), os(_os) { }
-        ~Validator() { }
+        Validator(std::istream &is, std::ostream &_os) : Reader(is), os(_os), errorCount(0) { }
+        ~Validator() {
+            if(errorCount == 0){
+                os<<"VALIDATED"<<std::endl;
+            }
+        }
 
         void reportError(std::string msg, std::string defaultMessage = "Undefined"){
+            errorCount++;
             os<<"Line "<<getLineCount()<<", Token "<<getTokenCount()<<std::endl;
 
             if(msg.empty()) msg = defaultMessage;
@@ -121,11 +127,18 @@ namespace TestValidator{
             char dummy[2] = {x, 0};
             char dummy2[2] = {0, 0};
 
-
             if(sscanf(dummy, format.c_str(), dummy2) != 1){
                 reportError(msg, "Character doesn't match character class");
             }
 
+            return true;
+        }
+
+        template<class T>
+        bool checkInterval(T &start, T &end, T lowerLimit, T upperlimit, std::string msg = ""){
+            if(!(lowerLimit <= start && start <= end && end <= upperlimit)){
+                reportError(msg, "Interval does not satisfy constraints");
+            }
             return true;
         }
 
@@ -152,12 +165,27 @@ namespace TestValidator{
             return true;
         }
 
+        template<class T>
+        bool readInterval(T &start, T &end, std::string msg = ""){
+            readInteger(start, msg);
+            readSpaceChar();
+            readInteger(end, msg);
+            return true;
+        }
+
 
         /// readers & constraint checkers
         template<class T>
         bool readIntegerBetween(T &x, T lowerLimit, T upperLimit, std::string msg = ""){
             readInteger(x, msg);
             checkNumberIsBetween(x, lowerLimit, upperLimit, msg);
+            return true;
+        }
+
+        template<class T>
+        bool readInterval(T &start, T &end, T lowerLimit, T upperLimit, std::string msg = ""){
+            readInterval(start, end, msg);
+            checkInterval(start, end, lowerLimit, upperLimit, msg);
             return true;
         }
 
