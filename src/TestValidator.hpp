@@ -2,7 +2,8 @@
 #include <cctype>
 #include <limits>
 #include <cassert>
-#include <regex>
+
+#include <iostream>
 
 namespace TestValidator{
     class Reader {
@@ -38,7 +39,7 @@ namespace TestValidator{
             return is.peek();
         }
     public:
-        Reader(std::istream& _is): is(_is) { 
+        Reader(std::istream& _is): is(_is) {
             lineCount = 0;
             tokenCount = 0;
             lastChar = '\n';
@@ -47,7 +48,7 @@ namespace TestValidator{
         ~Reader() { }
 
         bool readChar(char &x){
-            if(peekChar() == EOF) 
+            if(peekChar() == EOF)
                 return false;
             x = nextChar();
             return true;
@@ -85,6 +86,18 @@ namespace TestValidator{
             }
             return true;
         }
+
+        bool readString(std::string &x){
+            x.clear();
+            if(isspace(peekChar())) 
+                return false;
+
+            while(!isspace(peekChar())){
+                x.push_back(nextChar());
+            }
+
+            return true;
+        }
     };
 
     class Validator : protected Reader {
@@ -92,7 +105,7 @@ namespace TestValidator{
         std::ostream &os;
         int errorCount;
     protected:
-        
+
     public:
         Validator(std::istream &is, std::ostream &_os) : Reader(is), os(_os), errorCount(0) { }
         ~Validator() {
@@ -134,6 +147,20 @@ namespace TestValidator{
             return true;
         }
 
+        bool checkStringLengthBetween(std::string &x, size_t lowerLimit, size_t upperLimit, std::string msg = ""){
+            if(x.size() < lowerLimit || x.size() > upperLimit){
+                reportError(msg, "string size out of bounds");
+            }
+            return true;
+        }
+
+        bool checkStringMatchesClass(std::string &x, std::string charClass, std::string msg = ""){
+            for(char c : x){
+                checkCharMatchesClass(c, charClass, msg);
+            }
+            return true;
+        }
+
         template<class T>
         bool checkInterval(T &start, T &end, T lowerLimit, T upperlimit, std::string msg = ""){
             if(!(lowerLimit <= start && start <= end && end <= upperlimit)){
@@ -165,6 +192,13 @@ namespace TestValidator{
             return true;
         }
 
+        bool readString(std::string &x, std::string msg = ""){
+            if(!Reader::readString(x)){
+                reportError(msg, "String read failed.");
+            }
+            return true;
+        }
+
         template<class T>
         bool readInterval(T &start, T &end, std::string msg = ""){
             readInteger(start, msg);
@@ -183,7 +217,7 @@ namespace TestValidator{
         }
 
         template<class T>
-        bool readInterval(T &start, T &end, T lowerLimit, T upperLimit, std::string msg = ""){
+        bool readIntervalBetween(T &start, T &end, T lowerLimit, T upperLimit, std::string msg = ""){
             readInterval(start, end, msg);
             checkInterval(start, end, lowerLimit, upperLimit, msg);
             return true;
@@ -192,6 +226,13 @@ namespace TestValidator{
         bool readCharAndMatchClass(char &x, std::string charClass, std::string msg = ""){
             readChar(x, msg);
             checkCharMatchesClass(x, charClass, msg);
+            return true;
+        }
+
+        bool readStringBetweenLengthAndMatchClass(std::string &x, size_t lowerLimit, size_t upperLimit, std::string charClass, std::string msg = ""){
+            readString(x, msg);
+            checkStringLengthBetween(x, lowerLimit, upperLimit, msg);
+            checkStringMatchesClass(x, charClass, msg);
             return true;
         }
 
@@ -216,4 +257,16 @@ namespace TestValidator{
             return true;
         }
     };
+}
+
+int main(){
+
+    TestValidator::Validator validator(std::cin, std::cout);
+    
+    int n;
+    validator.readIntegerBetween(n, 1, 2*100000);
+
+    std::string s;
+
+    return 0;
 }

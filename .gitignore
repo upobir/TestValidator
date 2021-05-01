@@ -4,3 +4,6 @@
 
 # executables
 *.exe
+
+# dummy
+dummy/
