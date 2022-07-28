@@ -77,7 +77,7 @@ namespace TestValidator{
                 if(neg){
                     d = -d;
                 }
-                int threshold = (maxAllowed-d)/10;
+                T threshold = (maxAllowed-d)/10;
                 if((maxAllowed <= x && x < threshold) || (maxAllowed >= x && x > threshold)){
                     x = 0;
                     return false;
