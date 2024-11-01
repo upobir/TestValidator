@@ -11,12 +11,17 @@ If the input is validated then it will output validated which as is not the expe
 Your OJ might skip test cases if it encounters WA. Contact OJ support to solve this issue.
 
 ## Documentation
+
+<details><summary>
+
 ### Constructor
 ```cpp
 
 Validator(std::istream &is, std::ostream &_os)
 ```
 The Validator constructor initializes the validator, taking in input and output streams.
+
+</summary>
 
 **Parameters:**
 
@@ -27,14 +32,20 @@ The Validator constructor initializes the validator, taking in input and output 
 ```cpp
 Validator validator(std::cin, std::cout);
 ```
+</details>
 
 ### Constraint Checkers
-#### Check Number is Between a Range
+
+<details><summary>
+
+#### Check Number is Between a Range 
+
 ```cpp
 template<class T>
 bool checkNumberIsBetween(T &x, T lowerLimit, T upperLimit, std::string msg = "")
 ```
 Validates if a given number x lies between lowerLimit and upperLimit.
+</summary>
 
 **Parameters:**
 
@@ -48,11 +59,17 @@ Validates if a given number x lies between lowerLimit and upperLimit.
 int num = 5;
 validator.checkNumberIsBetween(num, 1, 10, "Number out of range");
 ```
+</details> 
+
+<details><summary>
+
 #### Check Character Matches Class
 ```cpp
 bool checkCharMatchesClass(char &x, std::string charClass, std::string msg = "")
 ```
 Validates if the character x matches any character in the specified charClass.
+
+</summary>
 
 **Parameters:**
 
@@ -65,11 +82,17 @@ Validates if the character x matches any character in the specified charClass.
 char ch = 'a';
 validator.checkCharMatchesClass(ch, "abc", "Invalid character");
 ```
+</details> 
+
+<details><summary>
+
 #### Check String Length Between
 ```cpp
 bool checkStringLengthBetween(std::string &x, size_t lowerLimit, size_t upperLimit, std::string msg = "")
 ```
 Ensures the length of string x falls within the range [lowerLimit, upperLimit].
+
+</summary>
 
 **Parameters:**
 
@@ -83,12 +106,18 @@ Ensures the length of string x falls within the range [lowerLimit, upperLimit].
 std::string str = "hello";
 validator.checkStringLengthBetween(str, 3, 10);
 ```
+</details> 
+
+<details><summary>
+
 #### Check Interval
 ```cpp
 template<class T>
 bool checkInterval(T &start, T &end, T lowerLimit, T upperlimit, std::string msg = "")
 ```
 Validates that start and end represent an interval within [lowerLimit, upperLimit].
+
+</summary>
 
 **Parameters:**
 
@@ -103,11 +132,17 @@ Validates that start and end represent an interval within [lowerLimit, upperLimi
 int start = 1, end = 5;
 validator.checkInterval(start, end, 1, 10);
 ```
+</details> 
+
+<details><summary>
+
 #### Check Condition
 ```cpp
 bool checkCondition(bool condition, std::string msg = "")
 ```
 Validates a custom condition.
+
+</summary>
 
 **Parameters:**
 
@@ -122,12 +157,18 @@ validator.checkCondition(isValid, "Condition not met");
 
 ### Readers with Constraint Checker
 
+</details> 
+
+<details><summary>
+
 #### Read Integer Between
 ```cpp
 template<class T>
 bool readIntegerBetween(T &x, T lowerLimit, T upperLimit, std::string msg = "")
 ```
 `readIntegerBetween` reads an integer x and validates if the integer lies within [lowerLimit, upperLimit].
+
+</summary>
 
 **Parameters:**
 
@@ -142,12 +183,18 @@ int n;
 validator.readIntegerBetween(n, 1, 500);
 ```
 
+</details> 
+
+<details><summary>
+
 #### Read Interval Between
 ```cpp
 template<class T>
 bool readIntervalBetween(T &start, T &end, T lowerLimit, T upperLimit, std::string msg = "")
 ```
 `readIntervalBetween` reads two integers, start and end, and ensures that the interval they form lies within [lowerLimit, upperLimit].
+
+</summary>
 
 **Parameters:**
 - start: Variable to store the start of the interval.
@@ -162,12 +209,18 @@ int start, end;
 validator.readIntervalBetween(start, end, 1, 10);
 ```
 
+</details> 
+
+<details><summary>
+
 #### Read Character and Match Class
 
 ```cpp
 bool readCharAndMatchClass(char &x, std::string charClass, std::string msg = "")
 ```
 `readCharAndMatchClass` reads a character x and validates if it belongs to the specified charClass.
+
+</summary>
 
 **Parameters:**
 - x: Variable to store the read character.
@@ -179,12 +232,18 @@ bool readCharAndMatchClass(char &x, std::string charClass, std::string msg = "")
 char ch;
 validator.readCharAndMatchClass(ch, "abc", "Invalid character");
 ```
+</details> 
+
+<details><summary>
+
 #### Read String Between Length and Match Class
 
 ```cpp
 bool readStringBetweenLengthAndMatchClass(std::string &x, size_t lowerLimit, size_t upperLimit, std::string charClass, std::string msg = "")
 ```
 `readStringBetweenLengthAndMatchClass` reads a string x, ensures its length falls between [lowerLimit, upperLimit], and checks that each character matches the specified charClass.
+
+</summary>
 
 **Parameters:**
 - x: Variable to store the read string.
@@ -198,7 +257,11 @@ msg: Custom error message if validation fails (optional).
 std::string str;
 validator.readStringBetweenLengthAndMatchClass(str, 1, 10, "abc123");
 ```
+</details>
+
 ### Additional Readers
+
+<details><summary>
 
 #### Read Space Character
 
@@ -207,6 +270,8 @@ bool readSpaceChar(std::string msg = "")
 ```
 `readSpaceChar` reads a single whitespace character. If the next character is not a space, it reports an error.
 
+</summary>
+
 **Parameters:**
 - msg: Custom error message if validation fails (optional).
 
@@ -214,12 +279,18 @@ bool readSpaceChar(std::string msg = "")
 ```cpp
 validator.readSpaceChar("Expected a space character");
 ```
+</details> 
+
+<details><summary>
+
 #### Read End of Line
 
 ```cpp
 bool readEndOfLine(std::string msg = "")
 ```
 `readEndOfLine` reads a newline character. If the next character is not a newline, it reports an error.
+
+</summary>
 
 **Parameters:**
 - msg: Custom error message if validation fails (optional).
@@ -228,12 +299,18 @@ bool readEndOfLine(std::string msg = "")
 ```cpp
 validator.readEndOfLine("Expected end of line");
 ```
+</details> 
+
+<details><summary>
+
 #### Read End of File
 
 ```cpp
 bool readEndOfFile(std::string msg = "")
 ```
 `readEndOfFile` checks if the end of the file has been reached. If not, it reports an error.
+
+</summary>
 
 **Parameters:**
 - msg: Custom error message if validation fails (optional).
@@ -242,26 +319,9 @@ bool readEndOfFile(std::string msg = "")
 ```cpp
 validator.readEndOfFile("Expected end of file");
 ```
+</details> 
 
 
-
-
-
-#### Read Integer in between a range
-```cpp
-bool readIntegerBetween(T &x, T lowerLimit, T upperLimit, std::string msg = "") 
-```  
-`readIntegerBetween` reads an integer `x` and validates if the said integer is between the expected range. 
-
-<details>
-
-<summary>Example</summary>
-
-```cpp
-int n;
-validator.readIntegerBetween(n, 1, 500);
-```
-</details>
 
 # Todo
 - Test integer read
